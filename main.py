@@ -12,33 +12,45 @@ CAMERA_HEIGHT = 480
 
 
 def get_rgb_from_confidence(confidence):
-    """Get the RGB color from the confidence threshold."""
+    """Get the RGB color from the confidence threshold.
+    
+    Args:
+        confidence (float): Confidence value between 0 and 1
+        
+    Returns:
+        tuple: BGR color values as (B, G, R) tuple
+    """
     # confidence is an integer between 0 and 100
     confidence = int(confidence * 100)
     colors = {
-        "color1": (92, 63, 0),  # #003f5c
+        "color1": (92, 63, 0),    # #003f5c
         "color2": (141, 80, 88),  # #58508d
-        "color3": (144, 80, 188),  # #bc5090
+        "color3": (144, 80, 188), # #bc5090
         "color4": (97, 99, 255),  # #ff6361
         "color5": (0, 166, 255),  # #ffa600
     }
 
-    # segment confidence into 5 equal parts
+    # segment confidence into 5 equal parts, 
+    #   return color closest to confidence
     segments = 5
     segment_size = 100 / segments
     for i in range(segments):
         if confidence < segment_size * (i + 1):
+            print(colors[f"color{i + 1}"])
             return colors[f"color{i + 1}"]
+    
+    # Return the last color if no segment matched
+    return colors["color5"]
 
 
 def initialize_camera():
     """Initialize and configure the camera."""
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
-    if not cap.isOpened():
+    capture_device = cv2.VideoCapture(0)
+    capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
+    capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
+    if not capture_device.isOpened():
         raise RuntimeError("Failed to open camera")
-    return cap
+    return capture_device
 
 
 def draw_detection(img, box, class_name, confidence):
@@ -63,13 +75,14 @@ def draw_detection(img, box, class_name, confidence):
 
 
 def main():
+    capture_device = None
     try:
         # Initialize model and camera
         model = YOLO(MODEL_PATH)
-        cap = initialize_camera()
+        capture_device = initialize_camera()
 
         while True:
-            ret, frame = cap.read()
+            ret, frame = capture_device.read()
             if not ret:
                 print("Failed to grab frame")
                 break
@@ -101,7 +114,8 @@ def main():
 
     finally:
         # Clean up
-        cap.release()
+        if capture_device is not None:
+            capture_device.release()
         cv2.destroyAllWindows()
 
 

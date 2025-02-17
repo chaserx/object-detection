@@ -13,7 +13,7 @@ It runs well on most modern laptops with a webcam. As tested, it runs well on a 
 - Customizable model and dataset
 - Easy to use and understand
 
-### Installation
+### Installation and Usage
 
 0. Install uv and dependencies
 
@@ -35,4 +35,8 @@ uv run main.py
 
 3. Stop the project
 
-Press `Esc` to stop the project.
+Press `Esc` to stop the program.
+
+### Results
+
+![detection results](./detection-results.png)
